@@ -33,7 +33,7 @@ public class ErrorController {
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorDto> handleException(BaseException ex) {
+    public ResponseEntity<ErrorDto> handleException(Exception ex) {
         log.error("Caught unexpected exception", ex);
         ErrorDto errorDto = ErrorDto.builder().status(HttpStatus.INTERNAL_SERVER_ERROR.value())
                 .message("An unexpected error occured").build();
