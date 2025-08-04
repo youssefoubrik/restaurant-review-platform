@@ -4,6 +4,7 @@ import static java.util.Objects.nonNull;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -67,6 +68,11 @@ public class RestaurantServiceImpl implements RestaurantService {
         }
 
         return restaurantRepository.findAll(pageable);
+    }
+
+    @Override
+    public Optional<Restaurant> getRestaurant(String id) {
+        return restaurantRepository.findById(id);
     }
 
 }

@@ -4,6 +4,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -39,7 +40,8 @@ public class RestaurantController {
     }
 
     @GetMapping
-    public Page<RestaurantSummmaryDto> searchRestaurants(@RequestParam(required = false) String q,
+    public Page<RestaurantSummmaryDto> searchRestaurants(
+            @RequestParam(required = false) String q,
             @RequestParam(required = false) Float minRating,
             @RequestParam(required = false) Float latitude,
             @RequestParam(required = false) Float longitude,
@@ -49,5 +51,13 @@ public class RestaurantController {
         Page<Restaurant> searchResults = restaurantService.searchRestaurants(q, minRating, latitude, longitude,
                 radius, PageRequest.of(page - 1, size));
         return searchResults.map(restaurantMapper::toSummmaryDto);
+    }
+
+    @GetMapping(path = "/{restaurant_id}")
+    public ResponseEntity<RestaurantDto> getRestaurant(@PathVariable("restaurant_id") String restaurantId) {
+        return restaurantService.getRestaurant(restaurantId)
+                .map(restaurantMapper::toRestaurantDto)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 }

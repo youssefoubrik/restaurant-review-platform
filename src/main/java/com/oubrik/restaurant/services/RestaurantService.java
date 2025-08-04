@@ -1,5 +1,7 @@
 package com.oubrik.restaurant.services;
 
+import java.util.Optional;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -16,4 +18,6 @@ public interface RestaurantService {
             Float longitude,
             Float radius,
             Pageable pageable);
+
+    Optional<Restaurant> getRestaurant(String id);
 }
