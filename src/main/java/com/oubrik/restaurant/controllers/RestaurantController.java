@@ -1,14 +1,19 @@
 package com.oubrik.restaurant.controllers;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.oubrik.restaurant.domain.RestaurantCreateUpdateRequest;
 import com.oubrik.restaurant.domain.dtos.RestaurantCreateUpdateRequestDto;
 import com.oubrik.restaurant.domain.dtos.RestaurantDto;
+import com.oubrik.restaurant.domain.dtos.RestaurantSummmaryDto;
 import com.oubrik.restaurant.domain.entities.Restaurant;
 import com.oubrik.restaurant.mappers.RestaurantMapper;
 import com.oubrik.restaurant.services.RestaurantService;
@@ -31,5 +36,18 @@ public class RestaurantController {
         Restaurant restaurant = restaurantService.createRestaurant(restaurantCreateUpdateRequest);
         RestaurantDto createdRestaurantDto = restaurantMapper.toRestaurantDto(restaurant);
         return ResponseEntity.ok(createdRestaurantDto);
+    }
+
+    @GetMapping
+    public Page<RestaurantSummmaryDto> searchRestaurants(@RequestParam(required = false) String q,
+            @RequestParam(required = false) Float minRating,
+            @RequestParam(required = false) Float latitude,
+            @RequestParam(required = false) Float longitude,
+            @RequestParam(required = false) Float radius,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "20") int size) {
+        Page<Restaurant> searchResults = restaurantService.searchRestaurants(q, minRating, latitude, longitude,
+                radius, PageRequest.of(page - 1, size));
+        return searchResults.map(restaurantMapper::toSummmaryDto);
     }
 }
