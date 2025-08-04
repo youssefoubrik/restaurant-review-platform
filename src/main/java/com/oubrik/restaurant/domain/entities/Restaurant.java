@@ -12,6 +12,7 @@ import org.springframework.data.elasticsearch.annotations.GeoPointField;
 import org.springframework.data.elasticsearch.core.geo.GeoPoint;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -21,6 +22,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Restaurant {
     @Id
     private String id;
@@ -29,7 +31,7 @@ public class Restaurant {
     private String name;
 
     @Field(type = FieldType.Text)
-    private String cuisine;
+    private String cuisineType;
 
     @Field(type = FieldType.Keyword)
     private String contactInformation;
@@ -47,9 +49,11 @@ public class Restaurant {
     private OperatingHours operatingHours;
 
     @Field(type = FieldType.Nested)
+    @Builder.Default
     private List<Photo> photos = new ArrayList<>();
 
     @Field(type = FieldType.Nested)
+    @Builder.Default
     private List<Review> reviews = new ArrayList<>();
 
     @Field(type = FieldType.Nested)
