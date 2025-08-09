@@ -23,6 +23,7 @@ public interface RestaurantMapper {
     @Mapping(target = "totalReviews", source = "reviews", qualifiedByName = "populateTotalReviews")
     RestaurantSummmaryDto toSummmaryDto(Restaurant restaurant);
 
+    @Mapping(target = "totalReviews", source = "reviews", qualifiedByName = "populateTotalReviews")
     RestaurantDto toRestaurantDto(Restaurant restaurant);
 
     @Mapping(target = "latitude", expression = "java(geoPoint.getLat())")

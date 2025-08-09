@@ -28,10 +28,10 @@ public class Review {
     @Field(type = FieldType.Integer)
     private Integer rating;
 
-    @Field(type = FieldType.Date, format = DateFormat.hour_minute_second)
+    @Field(type = FieldType.Date, format = DateFormat.date_hour_minute_second)
     private LocalDateTime datePosted;
 
-    @Field(type = FieldType.Date, format = DateFormat.hour_minute_second)
+    @Field(type = FieldType.Date, format = DateFormat.date_hour_minute_second)
     private LocalDateTime lastEdited;
 
     @Field(type = FieldType.Nested)

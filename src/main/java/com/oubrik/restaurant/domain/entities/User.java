@@ -3,6 +3,7 @@ package com.oubrik.restaurant.domain.entities;
 import org.springframework.data.elasticsearch.annotations.*;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -11,6 +12,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class User {
     @Field(type = FieldType.Keyword)
     private String id;

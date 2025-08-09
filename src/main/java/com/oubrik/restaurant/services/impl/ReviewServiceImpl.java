@@ -27,7 +27,7 @@ public class ReviewServiceImpl implements ReviewService {
         public Review createReview(User author, String restaurantId, ReviewCreateUpdateRequest review) {
                 Restaurant restaurant = getRestaurantOrThrow(restaurantId);
                 boolean hasExistingReview = restaurant.getReviews().stream()
-                                .anyMatch(r -> r.getWrittenBy().getId() == author.getId());
+                                .anyMatch(r -> r.getWrittenBy().getId().equals(author.getId()));
                 if (hasExistingReview) {
                         throw new ReviewNotAllowedException("User has already reviewed this restaurant");
                 }
@@ -51,7 +51,7 @@ public class ReviewServiceImpl implements ReviewService {
                 restaurant.getReviews().add(reviewToCreate);
                 updateRestaurantAverageRating(restaurant);
                 Restaurant savedRestaurant = restaurantRepository.save(restaurant);
-                return savedRestaurant.getReviews().stream().filter(r -> r.getId() == restaurantId).findFirst()
+                return savedRestaurant.getReviews().stream().filter(r -> r.getId().equals(reviewId)).findFirst()
                                 .orElseThrow(() -> new RuntimeException("Error retrieving created review"));
         }
 

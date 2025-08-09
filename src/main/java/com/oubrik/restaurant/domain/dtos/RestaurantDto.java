@@ -28,4 +28,5 @@ public class RestaurantDto {
     @Builder.Default
     private List<ReviewDto> reviews = new ArrayList<>();
     private UserDto createdBy;
+    private Integer totalReviews;
 }
