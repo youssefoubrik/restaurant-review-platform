@@ -8,6 +8,7 @@ import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.elasticsearch.ResourceNotFoundException;
 import org.springframework.data.elasticsearch.core.geo.GeoPoint;
 import org.springframework.stereotype.Service;
 
@@ -75,4 +76,23 @@ public class RestaurantServiceImpl implements RestaurantService {
         return restaurantRepository.findById(id);
     }
 
+    @Override
+    public Restaurant updateRestaurant(String id, RestaurantCreateUpdateRequest request) {
+        Restaurant restaurant = getRestaurant(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Restaurant with ID does not exist " + id));
+        GeoLocation newGeoLocation = geoLocationService.geoLocate(request.getAddress());
+        GeoPoint newGeoPoint = new GeoPoint(newGeoLocation.getLatitude(), newGeoLocation.getLongitude());
+        List<String> photoIds = request.getPhotoIds();
+        List<Photo> newPhotos = photoIds.stream().map(photoId -> Photo.builder().url(photoId)
+                .uploadDate(LocalDateTime.now())
+                .build()).toList();
+        restaurant.setName(request.getName());
+        restaurant.setCuisineType(request.getCuisineType());
+        restaurant.setAddress(request.getAddress());
+        restaurant.setContactInformation(request.getContactInformation());
+        restaurant.setGeoLocation(newGeoPoint);
+        restaurant.setOperatingHours(request.getOperatingHours());
+        restaurant.setPhotos(newPhotos);
+        return restaurantRepository.save(restaurant);
+    }
 }

@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.oubrik.restaurant.domain.dtos.ErrorDto;
 import com.oubrik.restaurant.exceptions.BaseException;
+import com.oubrik.restaurant.exceptions.RestaurantNotFoundException;
 import com.oubrik.restaurant.exceptions.StorageException;
 
 import lombok.extern.slf4j.Slf4j;
@@ -56,5 +57,15 @@ public class ErrorController {
                 .message(errorMessage)
                 .build();
         return new ResponseEntity<ErrorDto>(errorDto, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(RestaurantNotFoundException.class)
+    public ResponseEntity<ErrorDto> handleRestaurantNotFoundException(RestaurantNotFoundException ex) {
+        log.error("Caught RestaurantNotFoundException", ex);
+        ErrorDto errorDto = ErrorDto.builder()
+                .status(HttpStatus.NOT_FOUND.value())
+                .message("The specified restaurant wasn't found")
+                .build();
+        return new ResponseEntity<ErrorDto>(errorDto, HttpStatus.NOT_FOUND);
     }
 }
