@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.oubrik.restaurant.domain.dtos.ErrorDto;
 import com.oubrik.restaurant.exceptions.BaseException;
 import com.oubrik.restaurant.exceptions.RestaurantNotFoundException;
+import com.oubrik.restaurant.exceptions.ReviewNotAllowedException;
 import com.oubrik.restaurant.exceptions.StorageException;
 
 import lombok.extern.slf4j.Slf4j;
@@ -67,5 +68,15 @@ public class ErrorController {
                 .message("The specified restaurant wasn't found")
                 .build();
         return new ResponseEntity<ErrorDto>(errorDto, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(ReviewNotAllowedException.class)
+    public ResponseEntity<ErrorDto> handleReviewNotAllowedException(ReviewNotAllowedException ex) {
+        log.error("Caught ReviewNotAllowedException", ex);
+        ErrorDto errorDto = ErrorDto.builder()
+                .status(HttpStatus.BAD_REQUEST.value())
+                .message("The specified review cannot be updated or created")
+                .build();
+        return new ResponseEntity<ErrorDto>(errorDto, HttpStatus.BAD_REQUEST);
     }
 }
