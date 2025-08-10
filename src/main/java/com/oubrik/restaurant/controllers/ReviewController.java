@@ -1,8 +1,13 @@
 package com.oubrik.restaurant.controllers;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort.Direction;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -44,5 +49,11 @@ public class ReviewController {
                 .givenName(jwt.getClaimAsString("given_name"))
                 .familyName(jwt.getClaimAsString("family_name"))
                 .build();
+    }
+
+    @GetMapping
+    public Page<ReviewDto> listReviews(@PathVariable String restaurantId,
+            @PageableDefault(size = 20, page = 0, sort = "datePosted", direction = Direction.DESC) Pageable pageable) {
+        return reviewService.listReviews(restaurantId, pageable).map(reviewMapper::toDto);
     }
 }

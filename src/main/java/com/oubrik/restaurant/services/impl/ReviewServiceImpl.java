@@ -1,9 +1,15 @@
 package com.oubrik.restaurant.services.impl;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.oubrik.restaurant.domain.ReviewCreateUpdateRequest;
@@ -68,5 +74,32 @@ public class ReviewServiceImpl implements ReviewService {
                                 .average()
                                 .orElse(0);
                 restaurant.setAverageRating((float) averageRating);
+        }
+
+        @Override
+        public Page<Review> listReviews(String restaurantId, Pageable pageable) {
+                Restaurant restaurant = getRestaurantOrThrow(restaurantId);
+                List<Review> reviews = restaurant.getReviews();
+                Sort sort = pageable.getSort();
+                if (sort.isSorted()) {
+                        Sort.Order order = sort.stream().findFirst()
+                                        .orElseThrow(() -> new RuntimeException("No sort order found"));
+                        String property = order.getProperty();
+                        boolean isAscending = order.getDirection().isAscending();
+                        Comparator<Review> comparator = switch (property) {
+                                case "rating" -> Comparator.comparing(Review::getRating);
+                                default -> Comparator.comparing(Review::getDatePosted);
+                        };
+
+                        reviews.sort(isAscending ? comparator : comparator.reversed());
+                } else {
+                        reviews.sort(Comparator.comparing(Review::getDatePosted).reversed());
+                }
+                int start = (int) pageable.getOffset();
+                if (start >= reviews.size()) {
+                        return new PageImpl<>(Collections.emptyList(), pageable, reviews.size());
+                }
+                int end = Math.min((start + pageable.getPageSize()), reviews.size());
+                return new PageImpl<>(reviews.subList(start, end), pageable, reviews.size());
         }
 }
