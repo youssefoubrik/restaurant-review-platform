@@ -42,6 +42,19 @@ public class ReviewController {
         return ResponseEntity.ok(reviewMapper.toDto(createdReview));
     }
 
+    @GetMapping(path = "/{reviewId}")
+    public ResponseEntity<ReviewDto> getReview(@PathVariable String restaurantId, @PathVariable String reviewId) {
+        return reviewService.getReview(restaurantId, reviewId).map(reviewMapper::toDto).map(ResponseEntity::ok)
+                .orElseGet(
+                        () -> ResponseEntity.noContent().build());
+    }
+
+    @GetMapping
+    public Page<ReviewDto> listReviews(@PathVariable String restaurantId,
+            @PageableDefault(size = 20, page = 0, sort = "datePosted", direction = Direction.DESC) Pageable pageable) {
+        return reviewService.listReviews(restaurantId, pageable).map(reviewMapper::toDto);
+    }
+
     private User jwtToUser(Jwt jwt) {
         return User.builder()
                 .id(jwt.getSubject())
@@ -49,11 +62,5 @@ public class ReviewController {
                 .givenName(jwt.getClaimAsString("given_name"))
                 .familyName(jwt.getClaimAsString("family_name"))
                 .build();
-    }
-
-    @GetMapping
-    public Page<ReviewDto> listReviews(@PathVariable String restaurantId,
-            @PageableDefault(size = 20, page = 0, sort = "datePosted", direction = Direction.DESC) Pageable pageable) {
-        return reviewService.listReviews(restaurantId, pageable).map(reviewMapper::toDto);
     }
 }
