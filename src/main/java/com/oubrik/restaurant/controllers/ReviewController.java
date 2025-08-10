@@ -10,6 +10,7 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -53,6 +54,15 @@ public class ReviewController {
     public Page<ReviewDto> listReviews(@PathVariable String restaurantId,
             @PageableDefault(size = 20, page = 0, sort = "datePosted", direction = Direction.DESC) Pageable pageable) {
         return reviewService.listReviews(restaurantId, pageable).map(reviewMapper::toDto);
+    }
+
+    @PutMapping(path = "/{reviewId}")
+    public ResponseEntity<ReviewDto> updateReview(@PathVariable String restaurantId, @PathVariable String reviewId,
+            @Valid @RequestBody ReviewCreateUpdateRequestDto review, @AuthenticationPrincipal Jwt jwt) {
+        ReviewCreateUpdateRequest reviewCreateUpdateRequest = reviewMapper.toReviewCreateUpdateRequest(review);
+        User user = jwtToUser(jwt);
+        Review updateReview = reviewService.updateReview(user, restaurantId, reviewId, reviewCreateUpdateRequest);
+        return ResponseEntity.ok(reviewMapper.toDto(updateReview));
     }
 
     private User jwtToUser(Jwt jwt) {
