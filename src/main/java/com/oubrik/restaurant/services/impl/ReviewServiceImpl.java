@@ -21,6 +21,8 @@ import com.oubrik.restaurant.domain.entities.User;
 import com.oubrik.restaurant.domain.repositories.RestaurantRepository;
 import com.oubrik.restaurant.exceptions.RestaurantNotFoundException;
 import com.oubrik.restaurant.exceptions.ReviewNotAllowedException;
+import com.oubrik.restaurant.exceptions.ReviewNotFoundException;
+import com.oubrik.restaurant.exceptions.UnauthorizedReviewAccessException;
 import com.oubrik.restaurant.services.ReviewService;
 
 import lombok.RequiredArgsConstructor;
@@ -120,9 +122,10 @@ public class ReviewServiceImpl implements ReviewService {
                 Restaurant restaurant = getRestaurantOrThrow(restaurantId);
                 String authorId = author.getId();
                 Review existingReview = getReviewFromRestaurant(reviewId, restaurant)
-                                .orElseThrow(() -> new ReviewNotAllowedException("Review does not exist"));
+                                .orElseThrow(() -> new ReviewNotFoundException(
+                                                "Review with id " + reviewId + " not found"));
                 if (!existingReview.getWrittenBy().getId().equals(authorId)) {
-                        throw new ReviewNotAllowedException("Cannot update another user's review");
+                        throw new UnauthorizedReviewAccessException("You are not authorized to update this review");
                 }
                 if (LocalDateTime.now().isAfter(existingReview.getDatePosted().plusHours(24))) {
                         throw new ReviewNotAllowedException("Review can no longer be edited");
@@ -141,5 +144,24 @@ public class ReviewServiceImpl implements ReviewService {
                 // updateRestaurantAverageRating(restaurant);
                 restaurantRepository.save(restaurant);
                 return existingReview;
+        }
+
+        @Override
+        public void deleteReview(User author, String restaurantId, String reviewId) {
+                Restaurant restaurant = getRestaurantOrThrow(restaurantId);
+                Review existingReview = getReviewFromRestaurant(reviewId, restaurant)
+                                .orElseThrow(() -> new ReviewNotFoundException(
+                                                "Review with id " + reviewId + " not found"));
+
+                if (!author.getId().equals(existingReview.getWrittenBy().getId())) {
+                        throw new UnauthorizedReviewAccessException("You are not authorized to delete this review");
+                }
+
+                List<Review> updatedReviews = restaurant.getReviews().stream()
+                                .filter(r -> !r.getId().equals(reviewId))
+                                .toList();
+                restaurant.setReviews(updatedReviews);
+                updateRestaurantAverageRating(restaurant);
+                restaurantRepository.save(restaurant);
         }
 }

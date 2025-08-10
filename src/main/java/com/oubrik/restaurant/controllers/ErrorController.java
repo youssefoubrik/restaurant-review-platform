@@ -13,7 +13,9 @@ import com.oubrik.restaurant.domain.dtos.ErrorDto;
 import com.oubrik.restaurant.exceptions.BaseException;
 import com.oubrik.restaurant.exceptions.RestaurantNotFoundException;
 import com.oubrik.restaurant.exceptions.ReviewNotAllowedException;
+import com.oubrik.restaurant.exceptions.ReviewNotFoundException;
 import com.oubrik.restaurant.exceptions.StorageException;
+import com.oubrik.restaurant.exceptions.UnauthorizedReviewAccessException;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -78,5 +80,25 @@ public class ErrorController {
                 .message("The specified review cannot be updated or created")
                 .build();
         return new ResponseEntity<ErrorDto>(errorDto, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(ReviewNotFoundException.class)
+    public ResponseEntity<ErrorDto> handleReviewNotFoundException(ReviewNotFoundException ex) {
+        log.error("Caught ReviewNotFoundException", ex);
+        ErrorDto errorDto = ErrorDto.builder()
+                .status(HttpStatus.NOT_FOUND.value())
+                .message("The specified review was not found")
+                .build();
+        return new ResponseEntity<ErrorDto>(errorDto, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(UnauthorizedReviewAccessException.class)
+    public ResponseEntity<ErrorDto> handleUnauthorizedReviewAccessException(UnauthorizedReviewAccessException ex) {
+        log.error("Caught UnauthorizedReviewAccessException", ex);
+        ErrorDto errorDto = ErrorDto.builder()
+                .status(HttpStatus.FORBIDDEN.value())
+                .message("You are not authorized to modify this review")
+                .build();
+        return new ResponseEntity<ErrorDto>(errorDto, HttpStatus.FORBIDDEN);
     }
 }
