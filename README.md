@@ -6,7 +6,7 @@
 
 # Restaurant Review Platform 🍽️
 
-A modern restaurant review platform built with Spring Boot, Elasticsearch, and OAuth2 security. Part of the **Devtiro YouTube tutorial series**.
+A modern restaurant review platform built with Spring Boot, Elasticsearch, and OAuth2 security.
 
 [![Java](https://img.shields.io/badge/Java-21-orange.svg)](https://openjdk.java.net/projects/jdk/21/)
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.5.4-brightgreen.svg)](https://spring.io/projects/spring-boot)
